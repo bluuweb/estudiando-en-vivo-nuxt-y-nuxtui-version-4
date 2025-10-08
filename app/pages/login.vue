@@ -6,6 +6,9 @@ import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
 const toast = useToast();
 const serverError = ref<string | undefined>(undefined);
 
+// const myCookie = useCookie("public_email");
+// console.log("Cookie public_email:", myCookie.value);
+
 const fields: AuthFormField[] = [
   {
     name: "email",
