@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
   // TODO: Ver si vamos a trabajar con roles
   // TODO: Token y refresh token
   // TODO: Sesiones con h3 utilizando useSession
+  // TODO: nuxt-auth-utils
 
   return {
     message: "Login successful",
