@@ -3,11 +3,10 @@ import type { LoginSchemaType } from "#shared/zod/login.schema";
 import { loginSchema } from "#shared/zod/login.schema";
 import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
 
+const { user, loggedIn, fetch: refreshSession } = useUserSession();
+
 const toast = useToast();
 const serverError = ref<string | undefined>(undefined);
-
-// const myCookie = useCookie("public_email");
-// console.log("Cookie public_email:", myCookie.value);
 
 const fields: AuthFormField[] = [
   {
@@ -16,6 +15,7 @@ const fields: AuthFormField[] = [
     label: "Correo",
     placeholder: "Introduce tu correo",
     required: true,
+    defaultValue: "zephir@bluu.com",
   },
   {
     name: "password",
@@ -23,6 +23,7 @@ const fields: AuthFormField[] = [
     type: "password",
     placeholder: "Introduce tu contraseña",
     required: true,
+    defaultValue: "123123",
   },
   {
     name: "remember",
@@ -61,23 +62,25 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
     });
     toast.add({ title: "Success", description: "Login successful" });
     console.log({ response });
+    await refreshSession();
   } catch (error) {
-    if (error instanceof Error && "statusMessage" in error) {
-      console.log(typeof error);
-      // toast.add({ title: "Error", description: error.statusMessage });
-      serverError.value = error.statusMessage as string;
-      toast.add({
-        title: "Error",
-        description: error.statusMessage as string,
-        color: "error",
-      });
-    }
+    console.log(error);
+    toast.add({
+      title: "Error",
+      color: "error",
+    });
   }
 }
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-4">
+    <pre>
+    user: {{ user }}
+    </pre>
+    <pre>
+      loggedIn {{ loggedIn }}
+    </pre>
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="loginSchema"
