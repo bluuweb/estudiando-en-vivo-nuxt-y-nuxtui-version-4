@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   // TODO: Crear rutas protegidas
   // TODO: Ver si vamos a trabajar con roles
   // TODO: Token y refresh token
-  // TODO: Sesiones con h3 utilizando useSession
+  // TODO: Sesiones con h3 utilizando useSession (según la documentación es mejor utilzar nuxt-auth-utils)
   // TODO: nuxt-auth-utils
 
   return {
