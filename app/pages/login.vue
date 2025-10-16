@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { NuxtError } from "#app";
 import type { LoginSchemaType } from "#shared/zod/login.schema";
 import { loginSchema } from "#shared/zod/login.schema";
 import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
@@ -53,7 +54,7 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
   try {
     serverError.value = undefined;
 
-    const response = await $fetch("/api/login", {
+    await $fetch("/api/login", {
       method: "POST",
       body: {
         email: payload.data.email,
@@ -61,12 +62,14 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
       },
     });
     toast.add({ title: "Success", description: "Login successful" });
-    console.log({ response });
     await refreshSession();
+
+    await navigateTo("/dashboard");
   } catch (error) {
-    console.log(error);
+    const err = error as NuxtError;
     toast.add({
       title: "Error",
+      description: err.statusMessage || "Login failed 🚩",
       color: "error",
     });
   }

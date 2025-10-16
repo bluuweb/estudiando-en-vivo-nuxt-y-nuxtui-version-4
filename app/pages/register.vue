@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import type { NuxtError } from "#app";
 import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 
 const toast = useToast();
+
+const { fetch: refreshSession } = useUserSession();
 
 const fields: AuthFormField[] = [
   {
@@ -53,7 +56,26 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
-  console.log({ payload: payload.data.email });
+  try {
+    await $fetch("/api/register", {
+      method: "POST",
+      body: {
+        email: payload.data.email,
+        password: payload.data.password,
+      },
+    });
+    toast.add({ title: "Success", description: "Registration successful" });
+    await refreshSession();
+
+    await navigateTo("/dashboard");
+  } catch (error) {
+    const err = error as NuxtError;
+    toast.add({
+      title: "Error",
+      description: err.statusMessage || "Registration failed 🚩",
+      color: "error",
+    });
+  }
 }
 </script>
 
@@ -83,13 +105,6 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             tabindex="-1"
             >Forgot password?</ULink
           >
-        </template>
-        <template #validation>
-          <UAlert
-            color="error"
-            icon="i-lucide-info"
-            title="Error signing in"
-          />
         </template>
         <template #footer>
           By signing in, you agree to our
