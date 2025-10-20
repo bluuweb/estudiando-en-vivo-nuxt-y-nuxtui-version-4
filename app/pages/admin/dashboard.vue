@@ -1,17 +1,16 @@
 <script setup lang="ts">
 definePageMeta({
   middleware: "authenticated",
+  layout: "dashboard-layout",
 });
 
-const { user, clear: clearSession } = useUserSession();
+const { user, clear: clearSession, fetch } = useUserSession();
 
 async function logout() {
   await clearSession();
+  await fetch(); // Refresca el estado de la sesión del usuario
   await navigateTo("/login");
 }
-
-// TODO: Tipar la cookie
-// TODO: Averiguar "use server" en nuxt
 </script>
 
 <template>

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: "authenticated",
+});
+
 import type { NuxtError } from "#app";
 import type { LoginSchemaType } from "#shared/zod/login.schema";
 import { loginSchema } from "#shared/zod/login.schema";
@@ -16,7 +20,7 @@ const fields: AuthFormField[] = [
     label: "Correo",
     placeholder: "Introduce tu correo",
     required: true,
-    defaultValue: "zephir@bluu.com",
+    defaultValue: "test1@test.com",
   },
   {
     name: "password",
