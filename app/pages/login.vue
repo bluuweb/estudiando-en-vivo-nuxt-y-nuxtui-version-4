@@ -68,7 +68,7 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
     toast.add({ title: "Success", description: "Login successful" });
     await refreshSession();
 
-    await navigateTo("/dashboard");
+    await navigateTo("/admin/dashboard");
   } catch (error) {
     const err = error as NuxtError;
     toast.add({
