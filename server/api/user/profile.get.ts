@@ -15,6 +15,8 @@ export default eventHandler(async (event) => {
     select: {
       name: true,
       email: true,
+      avatar: true,
+      bio: true,
     },
   });
 
@@ -28,5 +30,7 @@ export default eventHandler(async (event) => {
   return {
     name: user.name,
     email: user.email,
+    avatar: user.avatar,
+    bio: user.bio,
   };
 });

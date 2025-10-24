@@ -11,14 +11,15 @@ export default eventHandler(async (event) => {
     });
   }
 
-  const { username } = await readValidatedBody(event, ProfileSchema.parse);
+  const { username, bio } = await readValidatedBody(event, ProfileSchema.parse);
 
   const updatedUser = await prisma.user.update({
     where: { email: session.user.email },
-    data: { name: username },
+    data: { name: username, bio },
     select: {
       name: true,
       email: true,
+      bio: true,
     },
   });
 

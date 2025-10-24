@@ -3,26 +3,43 @@ import type { NuxtError } from "#app";
 import type { ProfileSchemaType } from "#shared/zod/profile.schema";
 import { ProfileSchema } from "#shared/zod/profile.schema";
 import type { FormSubmitEvent } from "@nuxt/ui";
-// import type { User } from "~/generated/prisma";
+import type { User } from "@prisma/client";
 
-// Aquí nos traemos la sesión del usuario
 const { user, fetch: refreshSession } = useUserSession();
-
-// Pero también podríamos traernos los datos del perfil desde nuestra API
-// const { data: userDB } = await useFetch<User>("/api/user/profile");
+const { data: userDB } = await useFetch<User>("/api/user/profile");
 
 const profileState = reactive<Partial<ProfileSchemaType>>({
   username: user?.value?.name || "",
+  avatar: userDB.value?.avatar || "",
+  bio: userDB.value?.bio || "",
 });
 
 const toast = useToast();
+const fileRef = ref<HTMLInputElement>();
+const selectedFile = ref<File | null>(null);
 
-async function onSubmit(event: FormSubmitEvent<ProfileSchemaType>) {
+const onSubmit = async (event: FormSubmitEvent<ProfileSchemaType>) => {
   try {
+    // 1. Si hay una imagen nueva, subirla primero
+    if (selectedFile.value) {
+      const formData = new FormData();
+      formData.append("avatar", selectedFile.value);
+
+      const response = await $fetch("/api/user/upload-avatar", {
+        method: "PUT",
+        body: formData,
+      });
+
+      // Actualizar el estado con la URL del servidor
+      event.data.avatar = response.url;
+    }
+
+    // 2. Actualizar el perfil con todos los datos
     await $fetch("/api/user/profile", {
       method: "PUT",
       body: event.data,
     });
+
     toast.add({
       title: "Success",
       description: "Your settings have been updated.",
@@ -30,9 +47,13 @@ async function onSubmit(event: FormSubmitEvent<ProfileSchemaType>) {
       color: "success",
     });
 
-    // Refrescamos la sesión para obtener los nuevos datos del usuario en el frontend
+    // Refrescar la sesión
     await refreshSession();
+
+    // Limpiar el archivo seleccionado
+    selectedFile.value = null;
   } catch (error) {
+    console.log({ error });
     const err = error as NuxtError;
     toast.add({
       title: "Error",
@@ -40,8 +61,24 @@ async function onSubmit(event: FormSubmitEvent<ProfileSchemaType>) {
       color: "error",
     });
   }
+};
 
-  console.log(event.data);
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement;
+
+  if (!input.files?.length) {
+    return;
+  }
+
+  const file = input.files[0]!;
+  selectedFile.value = file;
+
+  // Mostrar preview local
+  profileState.avatar = URL.createObjectURL(file);
+}
+
+function onFileClick() {
+  fileRef.value?.click();
 }
 </script>
 
@@ -87,6 +124,49 @@ async function onSubmit(event: FormSubmitEvent<ProfileSchemaType>) {
         <UInput
           v-model="profileState.username"
           autocomplete="off"
+        />
+      </UFormField>
+
+      <USeparator />
+      <UFormField
+        name="avatar"
+        label="Avatar"
+        description="JPG, GIF or PNG. 1MB Max."
+        class="flex max-sm:flex-col justify-between sm:items-center gap-4"
+      >
+        <div class="flex flex-wrap items-center gap-3">
+          <UAvatar
+            :src="profileState.avatar"
+            :alt="profileState.username"
+            size="lg"
+          />
+          <UButton
+            label="Choose"
+            color="neutral"
+            @click="onFileClick"
+          />
+          <input
+            ref="fileRef"
+            type="file"
+            class="hidden"
+            accept=".jpg, .jpeg, .png, .gif"
+            @change="onFileChange"
+          />
+        </div>
+      </UFormField>
+      <USeparator />
+      <UFormField
+        name="bio"
+        label="Bio"
+        description="Brief description for your profile. URLs are hyperlinked."
+        class="flex max-sm:flex-col justify-between items-start gap-4"
+        :ui="{ container: 'w-full' }"
+      >
+        <UTextarea
+          v-model="profileState.bio"
+          :rows="5"
+          autoresize
+          class="w-full"
         />
       </UFormField>
     </UPageCard>
