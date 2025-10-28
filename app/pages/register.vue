@@ -102,14 +102,6 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             >Sign in</ULink
           >.
         </template>
-        <template #password-hint>
-          <ULink
-            to="#"
-            class="text-primary font-medium"
-            tabindex="-1"
-            >Forgot password?</ULink
-          >
-        </template>
         <template #footer>
           By signing in, you agree to our
           <ULink

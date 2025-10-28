@@ -107,7 +107,7 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
         </template>
         <template #password-hint>
           <ULink
-            to="#"
+            to="/auth/forgot-password"
             class="text-primary font-medium"
             tabindex="-1"
             >Forgot password?</ULink
