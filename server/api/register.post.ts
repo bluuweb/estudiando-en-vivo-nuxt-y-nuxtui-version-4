@@ -1,7 +1,5 @@
 import { loginSchema } from "#shared/zod/login.schema";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import prisma from "~~/lib/prisma";
 
 export default eventHandler(async (event) => {
@@ -48,17 +46,21 @@ export default eventHandler(async (event) => {
 
   // enviar correo electrónico con enlace y token para verificar la cuenta
 
-  const token = jwt.sign({ userId: userDB.id }, config.secretJwtKey, {
-    expiresIn: "1d",
+  // const token = jwt.sign({ userId: userDB.id }, config.secretJwtKey, {
+  //   expiresIn: "1d",
+  // });
+
+  const token = generateJwt({
+    userId: userDB.id,
+    secretKey: config.secretJwtKey,
+    expiresIn: 60 * 60 * 24, // 1 día en segundos
   });
 
-  const transporter = nodemailer.createTransport({
+  const transporter = createTransporter({
     host: config.nodemailer.smtpHost,
     port: Number(config.nodemailer.smtpPort),
-    auth: {
-      user: config.nodemailer.auth.smtpUser,
-      pass: config.nodemailer.auth.smtpPass,
-    },
+    user: config.nodemailer.auth.smtpUser,
+    pass: config.nodemailer.auth.smtpPass,
   });
 
   const urlVerify = `${config.public.appUrl}/auth/verify-email?token=${token}`;

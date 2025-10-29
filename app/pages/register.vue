@@ -8,6 +8,7 @@ import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 
 const toast = useToast();
+const loading = ref(false);
 
 const { fetch: refreshSession } = useUserSession();
 
@@ -61,14 +62,16 @@ type Schema = z.output<typeof schema>;
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
-    await $fetch("/api/register", {
+    loading.value = true;
+    const response = await $fetch("/api/register", {
       method: "POST",
       body: {
         email: payload.data.email,
         password: payload.data.password,
       },
     });
-    toast.add({ title: "Success", description: "Registration successful" });
+    // toast.add({ title: "Success", description: "Registration successful" });
+    toast.add({ title: "Success", description: response.message });
     await refreshSession();
 
     await navigateTo("/admin/dashboard");
@@ -79,6 +82,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       description: err.statusMessage || "Registration failed 🚩",
       color: "error",
     });
+  } finally {
+    loading.value = false;
   }
 }
 </script>
@@ -93,6 +98,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         title="Register a new account"
         icon="i-lucide-lock"
         @submit="onSubmit"
+        :loading="loading"
       >
         <template #description>
           Don't have an account?

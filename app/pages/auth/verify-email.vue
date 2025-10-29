@@ -2,9 +2,13 @@
 const route = useRoute();
 const token = route.query.token;
 
-const { data: isValid, error } = await useFetch("/api/user/verify-token", {
-  query: { token },
-});
+const { data: isValid, error } = await useFetch(
+  "/api/user/verify-token-email",
+  {
+    method: "POST",
+    body: { token },
+  }
+);
 
 if (error.value || !isValid.value) {
   // Mostrar error o redirigir

@@ -12,6 +12,7 @@ const { user, loggedIn, fetch: refreshSession } = useUserSession();
 
 const toast = useToast();
 const serverError = ref<string | undefined>(undefined);
+const loading = ref(false);
 
 const fields: AuthFormField[] = [
   {
@@ -56,6 +57,7 @@ const providers = [
 
 async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
   try {
+    loading.value = true;
     serverError.value = undefined;
 
     await $fetch("/api/login", {
@@ -76,6 +78,8 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
       description: err.statusMessage || "Login failed 🚩",
       color: "error",
     });
+  } finally {
+    loading.value = false;
   }
 }
 </script>
@@ -96,6 +100,7 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
         title="Login to your account"
         icon="i-lucide-lock"
         @submit="onSubmit"
+        :loading="loading"
       >
         <template #description>
           Don't have an account?
