@@ -12,13 +12,35 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  password String
-  name     String?
-  avatar   String?
-  bio      String?
+  id            Int     @id @default(autoincrement())
+  email         String  @unique
+  emailVerified Boolean @default(false)
+  password      String? // Ahora opcional (para usuarios OAuth)
+  name          String?
+  avatar        String?
+  bio           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
   posts    Post[]
+  accounts Account[] // Múltiples cuentas (GitHub, Google, etc.)
+
+  @@map("users") // La tabla se llama "users" en la BD
+}
+
+model Account {
+  id                Int     @id @default(autoincrement())
+  userId            Int
+  provider          String // "github", "google", "email"
+  providerAccountId String // ID del proveedor (GitHub ID, Google ID, etc.)
+  emailVerified     Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts") // La tabla se llama "accounts" en la BD
 }
 
 model Post {

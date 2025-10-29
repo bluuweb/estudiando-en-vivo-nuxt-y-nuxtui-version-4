@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     nodemailer: {
       smtpHost: process.env.NUXT_SMTP_HOST || "sandbox.smtp.mailtrap.io",
-      smtpPort: process.env.NUXT_SMTP_PORT || 2525,
+      smtpPort: process.env.NUXT_SMTP_PORT || "2525",
       auth: {
         smtpUser: process.env.NUXT_SMTP_USER || "",
         smtpPass: process.env.NUXT_SMTP_PASS || "",

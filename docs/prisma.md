@@ -7,3 +7,9 @@ npx prisma migrate dev --name add_avatar_to_user
 # 3. Regenerar el cliente (se hace automáticamente con migrate dev, pero puedes ejecutarlo manualmente)
 
 npx prisma generate
+
+## Reset de db osea perder todos los datos
+
+```sh
+npx prisma migrate reset
+```
