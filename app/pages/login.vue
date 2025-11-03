@@ -103,6 +103,15 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
         :loading="loading"
       >
         <template #description>
+          <UButton
+            v-if="!loggedIn"
+            to="/api/auth/github"
+            icon="i-simple-icons-github"
+            label="Login with GitHub"
+            color="neutral"
+            size="xs"
+            external
+          />
           Don't have an account?
           <ULink
             to="/register"

@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Verificar y decodificar el token JWT
-    const decoded = jwt.verify(token as string, config.secretJwtKey);
+    jwt.verify(token as string, config.secretJwtKey);
   } catch (error) {
     throw createError({
       statusCode: 400,

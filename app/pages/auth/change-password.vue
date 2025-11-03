@@ -10,8 +10,6 @@ const { data: isValid, error } = await useFetch("/api/user/verify-token", {
   query: { token },
 });
 
-console.log({ isValid, error });
-
 if (error.value || !isValid.value) {
   // Mostrar error o redirigir
   throw createError({
@@ -45,6 +43,7 @@ const onSubmit = async (event: { data: ChangePasswordSchemaType }) => {
   } catch (error) {
     console.log({ error });
     const err = error as NuxtError;
+    console.log({ superError: err.statusMessage });
     toast.add({
       title: "Error",
       description: err.statusMessage || "Failed to send reset link 🚩",

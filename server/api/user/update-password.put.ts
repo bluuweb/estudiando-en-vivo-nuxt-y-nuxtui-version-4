@@ -28,7 +28,7 @@ export default eventHandler(async (event) => {
     });
   }
 
-  const isCurrentPasswordValid = await bcrypt.compare(current, user.password);
+  const isCurrentPasswordValid = await bcrypt.compare(current, user.password!);
 
   if (!isCurrentPasswordValid) {
     throw createError({

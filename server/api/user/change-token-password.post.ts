@@ -19,6 +19,32 @@ export default defineEventHandler(async (event) => {
     const parsedData = changePasswordSchema.parse({ password: newPassword });
 
     const bcrypt = await import("bcryptjs");
+
+    // Comparar contraseñas para asegurarse de que no sea la misma
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return createError({
+        statusCode: 404,
+        statusMessage: "User not found",
+      });
+    }
+
+    const isSamePassword = await bcrypt.compare(
+      parsedData.password,
+      user.password!
+    );
+
+    if (isSamePassword) {
+      console.log("😡Contraseña igual!!!");
+      return createError({
+        statusCode: 400,
+        statusMessage: "New password must be different from the old password",
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(parsedData.password, 10);
 
     // Actualizar la contraseña del usuario en la base de datos

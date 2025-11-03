@@ -5,9 +5,12 @@ import { forgotPasswordSchema } from "#shared/zod/forgot-password.schema";
 
 const toast = useToast();
 const email = ref<string>("");
+const loading = ref(false);
+const sentEmail = ref(false);
 
 const onSubmit = async (event: { data: ForgotPasswordSchemaType }) => {
   try {
+    loading.value = true;
     await $fetch("/api/user/forgot-password", {
       method: "POST",
       body: event.data,
@@ -18,6 +21,8 @@ const onSubmit = async (event: { data: ForgotPasswordSchemaType }) => {
       icon: "i-lucide-check",
       color: "success",
     });
+    sentEmail.value = true;
+    // await $fetch("/api/user/counter");
   } catch (error) {
     console.log({ error });
     const err = error as NuxtError;
@@ -26,6 +31,8 @@ const onSubmit = async (event: { data: ForgotPasswordSchemaType }) => {
       description: err.statusMessage || "Failed to send reset link 🚩",
       color: "error",
     });
+  } finally {
+    loading.value = false;
   }
 };
 </script>
@@ -56,6 +63,8 @@ const onSubmit = async (event: { data: ForgotPasswordSchemaType }) => {
         <UButton
           type="submit"
           class="w-full"
+          :loading="loading"
+          :disabled="sentEmail"
           >Send Reset Link</UButton
         >
       </UForm>
