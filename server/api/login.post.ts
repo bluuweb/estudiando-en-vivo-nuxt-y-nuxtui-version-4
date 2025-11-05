@@ -10,17 +10,33 @@ export default defineEventHandler(async (event) => {
     where: { email },
   });
 
-  // TODO: Implementar lógica de cuentas vinculadas
-
   if (!user) {
     console.log("ERROR: User not found");
     throw createError({
       statusCode: 404,
-      statusMessage: "User not found",
+      statusMessage: "No existe esta cuenta ni una cuenta vinculada",
     });
   }
 
-  if (!user.emailVerified) {
+  const account = await prisma.account.findUnique({
+    where: {
+      provider_providerAccountId: {
+        provider: "email",
+        providerAccountId: email,
+      },
+    },
+  });
+
+  if (!account) {
+    console.log("ERROR: No account linked to email provider");
+    throw createError({
+      statusCode: 404,
+      statusMessage:
+        "Esta cuenta existe pero no esta vinculada al proveedor email",
+    });
+  }
+
+  if (account && !account.emailVerified) {
     const token = generateJwt({
       userId: user.id,
       secretKey: config.secretJwtKey,

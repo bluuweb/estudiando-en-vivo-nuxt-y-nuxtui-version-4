@@ -3,8 +3,13 @@
 TODOS:
 
 - [x] Revisar que cuando cambie la contraseña a través de email, la constraseña sea diferente a la anterior.
-- [ ] Guardar el usuario de github en la base de datos
-- [ ] Vincular cuentas de redes sociales (Google, Facebook, etc.) al registro e inicio de sesión.
+- [x] Guardar el usuario de github en la base de datos.
+- [x] Vincular cuentas de redes sociales (Google, Facebook, etc.) al registro e inicio de sesión.
+- [x] Falta arreglar la UI de inicio de sesion y registro.
+- [ ] Qué el usuario pueda ver las cuentas vinculadas en su perfil y desvincularlas.
+- [ ] Refactorizar código repetido en login y register (backend).
+
+- [todo con Nuxt, Nuxt-auth-utils, drizzle](https://github.com/atinux/atidone)
 
 ## Vincular cuentas de redes sociales
 

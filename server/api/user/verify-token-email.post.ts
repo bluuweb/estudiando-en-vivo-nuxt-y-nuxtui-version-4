@@ -12,9 +12,12 @@ export default defineEventHandler(async (event) => {
 
     const userId = decoded.userId;
 
-    // Actualizar el usuario en la base de datos para marcar el correo como verificado
-    await prisma.user.update({
-      where: { id: userId },
+    // Actualizar el usuario en la base de datos para marcar el correo como verificado en la tabla account del provider "email"
+    await prisma.account.updateMany({
+      where: {
+        userId: userId,
+        provider: "email",
+      },
       data: {
         emailVerified: true,
       },

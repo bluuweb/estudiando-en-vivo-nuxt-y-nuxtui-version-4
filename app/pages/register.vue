@@ -45,7 +45,8 @@ const providers = [
   {
     label: "GitHub",
     icon: "i-simple-icons-github",
-    onClick: () => {
+    onClick: async () => {
+      await navigateTo("/api/auth/github", { external: true });
       toast.add({ title: "GitHub", description: "Login with GitHub" });
     },
   },

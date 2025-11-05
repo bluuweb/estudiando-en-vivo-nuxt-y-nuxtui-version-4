@@ -8,7 +8,7 @@ import type { LoginSchemaType } from "#shared/zod/login.schema";
 import { loginSchema } from "#shared/zod/login.schema";
 import type { AuthFormField, FormSubmitEvent } from "@nuxt/ui";
 
-const { user, loggedIn, fetch: refreshSession } = useUserSession();
+const { fetch: refreshSession } = useUserSession();
 
 const toast = useToast();
 const serverError = ref<string | undefined>(undefined);
@@ -48,8 +48,11 @@ const providers = [
   },
   {
     label: "GitHub",
+    // loading: loading,
     icon: "i-simple-icons-github",
-    onClick: () => {
+    onClick: async () => {
+      // loading.value = true;
+      await navigateTo("/api/auth/github", { external: true });
       toast.add({ title: "GitHub", description: "Login with GitHub" });
     },
   },
@@ -86,12 +89,6 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
 
 <template>
   <div class="flex flex-col items-center justify-center gap-4 p-4">
-    <pre>
-    user: {{ user }}
-    </pre>
-    <pre>
-      loggedIn {{ loggedIn }}
-    </pre>
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="loginSchema"
@@ -103,7 +100,7 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
         :loading="loading"
       >
         <template #description>
-          <UButton
+          <!-- <UButton
             v-if="!loggedIn"
             to="/api/auth/github"
             icon="i-simple-icons-github"
@@ -111,7 +108,7 @@ async function onSubmit(payload: FormSubmitEvent<LoginSchemaType>) {
             color="neutral"
             size="xs"
             external
-          />
+          /> -->
           Don't have an account?
           <ULink
             to="/register"

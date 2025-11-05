@@ -1,3 +1,5 @@
+import prisma from "~~/lib/prisma";
+
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
   const code = query.code as string;
@@ -61,6 +63,40 @@ export default defineEventHandler(async (event) => {
 
   // Aquí puedes manejar el inicio de sesión o registro del usuario en tu sistema
   // Usando los datos obtenidos de GitHub (user y primaryEmail)
+
+  // Buscar al usuario en la base de datos
+  let userDB = await prisma.user.findUnique({
+    where: { email: primaryEmail.email },
+  });
+
+  // Si el usuario no existe, crearlo (ya revisamos arriba que el correo está verificado)
+  if (!userDB) {
+    userDB = await prisma.user.create({
+      data: {
+        email: primaryEmail.email,
+        name: (user as any).name || primaryEmail.email.split("@")[0],
+        accounts: {
+          create: {
+            provider: "github",
+            providerAccountId: (user as any).id.toString(),
+            emailVerified: primaryEmail.verified,
+          },
+        },
+      },
+    });
+  }
+
+  // Si el usuario existe pero no tiene la cuenta de GitHub vinculada, vincularla
+  else {
+    await prisma.account.create({
+      data: {
+        userId: userDB.id,
+        provider: "github",
+        providerAccountId: (user as any).id.toString(),
+        emailVerified: primaryEmail.verified,
+      },
+    });
+  }
 
   // Por ejemplo, podrías crear una sesión para el usuario:
   await setUserSession(event, {
