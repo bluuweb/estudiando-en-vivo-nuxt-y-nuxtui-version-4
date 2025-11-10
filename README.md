@@ -6,8 +6,10 @@ TODOS:
 - [x] Guardar el usuario de github en la base de datos.
 - [x] Vincular cuentas de redes sociales (Google, Facebook, etc.) al registro e inicio de sesión.
 - [x] Falta arreglar la UI de inicio de sesion y registro.
-- [ ] Qué el usuario pueda ver las cuentas vinculadas en su perfil y desvincularlas.
-- [ ] Refactorizar código repetido en login y register (backend).
+- [x] Qué el usuario pueda ver las cuentas vinculadas en su perfil y desvincularlas.
+- [ ] Desvincular la cuenta de github en la página de github
+- [ ] Refactorizar código repetido en login y register (backend) Ayudarte con Copilot IA.
+- [ ] Averiguar si se puede documentar la API de nuxt al estilo de swagger.
 
 - [todo con Nuxt, Nuxt-auth-utils, drizzle](https://github.com/atinux/atidone)
 
