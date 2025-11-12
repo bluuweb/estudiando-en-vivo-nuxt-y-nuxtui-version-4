@@ -1,3 +1,4 @@
+// server/api/auth/github-callback.get.ts
 import prisma from "~~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
@@ -12,7 +13,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig();
-
   const clientId = config.oauth.github.clientId;
   const clientSecret = config.oauth.github.clientSecret;
 
@@ -21,9 +21,7 @@ export default defineEventHandler(async (event) => {
     "https://github.com/login/oauth/access_token",
     {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: { Accept: "application/json" },
       body: {
         client_id: clientId,
         client_secret: clientSecret,
@@ -34,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
   const accessToken = tokenResponse.access_token;
 
-  // Obtener los datos del usuario
+  // Obtener datos del usuario
   const user = await $fetch("https://api.github.com/user", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -42,7 +40,7 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  // Obtener el email del usuario
+  // Obtener email
   const emails = await $fetch<
     Array<{ email: string; primary: boolean; verified: boolean }>
   >("https://api.github.com/user/emails", {
@@ -61,16 +59,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Aquí puedes manejar el inicio de sesión o registro del usuario en tu sistema
-  // Usando los datos obtenidos de GitHub (user y primaryEmail)
-
-  // Buscar al usuario en la base de datos
+  // Buscar o crear usuario
   let userDB = await prisma.user.findUnique({
     where: { email: primaryEmail.email },
+    include: { accounts: true },
   });
 
-  // Si el usuario no existe, crearlo (ya revisamos arriba que el correo está verificado)
   if (!userDB) {
+    // Crear nuevo usuario con cuenta GitHub
     userDB = await prisma.user.create({
       data: {
         email: primaryEmail.email,
@@ -80,25 +76,38 @@ export default defineEventHandler(async (event) => {
             provider: "github",
             providerAccountId: (user as any).id.toString(),
             emailVerified: primaryEmail.verified,
+            accessToken, // Guardar el token
           },
         },
       },
+      include: { accounts: true },
     });
+  } else {
+    // Verificar si ya tiene cuenta GitHub vinculada
+    const existingGitHubAccount = userDB.accounts.find(
+      (acc) => acc.provider === "github"
+    );
+
+    if (!existingGitHubAccount) {
+      // Vincular cuenta GitHub
+      await prisma.account.create({
+        data: {
+          userId: userDB.id,
+          provider: "github",
+          providerAccountId: (user as any).id.toString(),
+          emailVerified: primaryEmail.verified,
+          accessToken, // Guardar el token
+        },
+      });
+    } else {
+      // Actualizar token existente
+      await prisma.account.update({
+        where: { id: existingGitHubAccount.id },
+        data: { accessToken },
+      });
+    }
   }
 
-  // Si el usuario existe pero no tiene la cuenta de GitHub vinculada, vincularla
-  else {
-    await prisma.account.create({
-      data: {
-        userId: userDB.id,
-        provider: "github",
-        providerAccountId: (user as any).id.toString(),
-        emailVerified: primaryEmail.verified,
-      },
-    });
-  }
-
-  // Por ejemplo, podrías crear una sesión para el usuario:
   await setUserSession(event, {
     user: {
       name: (user as any).name || primaryEmail.email.split("@")[0],
@@ -106,6 +115,5 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  // Redirigir al usuario a la página principal o a donde desees
   return sendRedirect(event, "/admin/dashboard");
 });

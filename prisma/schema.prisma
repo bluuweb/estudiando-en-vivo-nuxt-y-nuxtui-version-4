@@ -37,6 +37,11 @@ model Account {
   providerAccountId String // ID del proveedor (GitHub ID, Google ID, etc.)
   emailVerified     Boolean @default(false)
 
+  // Agregar campos para OAuth
+  accessToken  String? // Token de acceso
+  refreshToken String? // Token de refresco (si aplica)
+  expiresAt    Int? // Timestamp de expiración
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])

@@ -7,9 +7,9 @@ TODOS:
 - [x] Vincular cuentas de redes sociales (Google, Facebook, etc.) al registro e inicio de sesión.
 - [x] Falta arreglar la UI de inicio de sesion y registro.
 - [x] Qué el usuario pueda ver las cuentas vinculadas en su perfil y desvincularlas.
-- [ ] Desvincular la cuenta de github en la página de github
+- [x] Averiguar si se puede documentar la API de nuxt al estilo de swagger. (en conclusión no se puede por ahora).
+- [x] Revocar el token de acceso del usuario ante GitHub al momento de desvincular la cuenta.
 - [ ] Refactorizar código repetido en login y register (backend) Ayudarte con Copilot IA.
-- [ ] Averiguar si se puede documentar la API de nuxt al estilo de swagger.
 
 - [todo con Nuxt, Nuxt-auth-utils, drizzle](https://github.com/atinux/atidone)
 

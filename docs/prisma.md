@@ -13,3 +13,9 @@ npx prisma generate
 ```sh
 npx prisma migrate reset
 ```
+
+## Si no te interesan las migraciones todavía y solo quieres que la base de datos quede igual al schema:
+
+```sh
+npx prisma db push --force-reset
+```
